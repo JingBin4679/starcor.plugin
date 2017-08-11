@@ -4,11 +4,8 @@ import com.starcor.plugins.sdk.BasePlugin;
 
 public class ${NAME} extends BasePlugin{
 
-    private static final String PLUGIN_ID = "";//enter your plugin id
-    private static final String PLUGIN_NAME = "";//enter your plugin name
-    private static final int PLUGIN_VERSION = 1;
-
     public ${NAME}() {
+        //TODO init your plugin code
     }
 
     @Override

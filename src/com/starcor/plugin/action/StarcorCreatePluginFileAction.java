@@ -6,16 +6,14 @@ import com.intellij.ide.actions.CreateDirectoryOrPackageHandler;
 import com.intellij.ide.util.DirectoryChooserUtil;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.impl.file.PsiDirectoryFactory;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
@@ -26,6 +24,8 @@ public class StarcorCreatePluginFileAction extends CreateDirectoryOrPackageActio
     public static final String NEW_STARCOR_PLUGIN_FILE = "New Starcor Plugin File";
     private static final String FILE_TEMPLATE = "Starcor.Plugin";
     public static final String PLUGIN_PROTOCOL = "plugin_protocol.xml";
+    private static final Logger LOGGER = Logger.getInstance(StarcorCreatePluginFileAction.class);
+
 
     public StarcorCreatePluginFileAction() {
         super();
@@ -52,22 +52,39 @@ public class StarcorCreatePluginFileAction extends CreateDirectoryOrPackageActio
 
     /**
      * 生成Java代码
+     *
      * @param psiDirectory
      */
     private void genJavaCode(Project project, PsiDirectory psiDirectory) {
+
+
+        PsiClass psiClass = JavaDirectoryService.getInstance().createClass(psiDirectory, "Plugin", FILE_TEMPLATE);
+        PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
+        String pluginName = psiDirectory.getName();
+        String pluginId = "plugin://" + pluginName;
         WriteCommandAction.runWriteCommandAction(project, new Runnable() {
             @Override
             public void run() {
-                PsiClass psiClass = JavaDirectoryService.getInstance().createClass(psiDirectory, "Plugin");
-                PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
-                PsiField field = factory.createField("PLUGIN_VERSION", PsiType.INT);
-                field.getModifierList().setModifierProperty(PsiModifier.PUBLIC,true);
+                PsiField field = factory.createFieldFromText("public String PLUGIN_ID = \""+ pluginId+"\";", psiClass);
+                psiClass.add(field);
+                field = factory.createFieldFromText("public String PLUGIN_NAME = \"" + pluginName + "\";", psiClass);
+                psiClass.add(field);
+                field = factory.createFieldFromText("public int PLUGIN_VERSION = 1;", psiClass);
+                psiClass.add(field);
+
+                PsiFile file = psiDirectory.findFile("Plugin.java");
+                if (file != null) {
+                    FileEditorManager.getInstance(project).openFile(file.getVirtualFile(), true, true);
+                }
             }
         });
+
+
     }
 
     /**
      * 生成协议文件
+     *
      * @param project
      * @param psiDirectory
      */
@@ -79,7 +96,6 @@ public class StarcorCreatePluginFileAction extends CreateDirectoryOrPackageActio
                 PsiDirectory baseDir = PsiDirectoryFactory.getInstance(project).createDirectory(project.getBaseDir());
                 PsiDirectory pluginsDir = baseDir.findSubdirectory("plugins");
                 if (pluginsDir == null) {
-
                     pluginsDir = baseDir.createSubdirectory("plugins");
                 }
                 PsiDirectory pluginProtocolDir = pluginsDir.findSubdirectory(pluginName);
@@ -96,10 +112,6 @@ public class StarcorCreatePluginFileAction extends CreateDirectoryOrPackageActio
                         rootTag.setAttribute("id", "plugin://" + pluginName);
                         rootTag.setAttribute("name", pluginName);
                         rootTag.setAttribute("version", "1");
-                        PsiFile psiFile = pluginProtocolDir.findFile(PLUGIN_PROTOCOL);
-                        if (psiFile != null) {
-                            psiFile.delete();
-                        }
                         pluginProtocolDir.add(xmlFile);
                     }
                 }

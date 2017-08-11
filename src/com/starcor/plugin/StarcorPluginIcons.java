@@ -6,5 +6,5 @@ import javax.swing.*;
 
 public class StarcorPluginIcons {
 
-    public static final Icon ICON = IconLoader.findIcon("/icon/plugin.png");
+    public static final Icon ICON = IconLoader.findIcon("/icon/plugin_icon_16.png");
 }

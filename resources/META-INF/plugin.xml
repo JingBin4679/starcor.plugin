@@ -1,17 +1,15 @@
 <idea-plugin>
-  <id>com.your.company.unique.plugin.id</id>
-  <name>Plugin display name here</name>
+  <id>com.starcor.plugin.develop</id>
+  <name>Starcor.Plugin</name>
   <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <vendor email="bin.jing@starcor.com" url="http://www.starcor.com">Starcor</vendor>
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      视达科插件开发工具，生成Plugin.java和对应的协议文件。
     ]]></description>
 
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+
     ]]>
   </change-notes>
 
@@ -32,7 +30,7 @@
   <actions>
     <!-- Add your actions here -->
     <action id="Starcor.NewPluginFile" class="com.starcor.plugin.action.StarcorCreatePluginFileAction"
-            text="New Starcor Plugin File" description="Create new Starcor plugin file" icon="/icon/plugin.png">
+            text="New Starcor Plugin File" description="Create new starcor plugin file" icon="/icon/plugin_icon_16.png">
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
     </action>
   </actions>
